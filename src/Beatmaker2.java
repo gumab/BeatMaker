@@ -1,5 +1,3 @@
-import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -7,14 +5,7 @@ import javax.swing.event.*;
 
 import java.awt.*;
 
-import java.util.HashMap;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 import javax.sound.sampled.*;
 
@@ -45,7 +36,7 @@ public class Beatmaker2
 class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		MouseListener
 {
-	public JFrame frame;
+	public JFrame frame,popUp;
 	private JButton btnKick, btnSnare, btnHiHat, btnClap, btnInst5, btnInst6,
 			btnInst7, btnInst8, btnPlay, btnStop, btnSave, btnLoad, btnApply;
 
@@ -91,11 +82,12 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 
 	private Pattern[] ptn;
 
-	private boolean playing = false, loopFlag = false;
+	public static boolean playing;
+	private boolean loopFlag = false;
 
-	private JLabel txt2, txt3;
+	private JLabel txtCount;
 
-	private int[] ptnStream = new int[100];
+	private int[] ptnStream = new int[500];
 
 	private JPanel melodyPanel;
 
@@ -113,13 +105,22 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		}
 
 		frame = new JFrame();
-		frame.setTitle("BeatMaker_DEMO_v005");
+		frame.setTitle("BeatMaker_DEMO_v006");
 		frame.setBounds(100, 100, 480, 570);
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addMouseListener(this);
 
 		frame.getContentPane().setLayout(null);
+		
+		popUp = new JFrame();
+		popUp.setTitle("Error");
+		popUp.setBounds(640, 360, 200, 100);
+		popUp.setResizable(false);
 
+		
+		
+		
 		btnKick = new JButton("Kick");
 		btnKick.setToolTipText("hear Kick sound");
 		btnKick.setBounds(14, 123, 73, 23);
@@ -446,7 +447,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		ptnField.setText("패턴을 입력하세요 ex)1123");
 		ptnField.setBounds(14, 40, 240, 21);
 		frame.getContentPane().add(ptnField);
-		ptnField.setColumns(100);
+		ptnField.setColumns(500);
 		ptnField.addActionListener(this);
 		ptnField.addMouseListener(this);
 
@@ -478,16 +479,22 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		progressBar = new JProgressBar();
 		progressBar.setBounds(93, 366, 355, 15);
 		frame.getContentPane().add(progressBar);
+		
+		txtCount= new JLabel("0/0");
+		txtCount.setBounds(93, 380, 50, 15);
+		frame.getContentPane().add(txtCount);
 
-		keyGuide = new ImageIcon("piano.jpg");
+		/*keyGuide = new ImageIcon("piano.jpg");
 		imageLabel = new JLabel(keyGuide);
 		imageLabel.setToolTipText("멜로디 기능을 이용하려면 클릭하세요");
 		imageLabel.setBounds(0, 388, 466, 142);
 		frame.getContentPane().add(imageLabel);
 		imageLabel.addMouseListener(this);
+		imageLabel.setVisible(false);*/
 
 		melodyPanel = new MelodyPanel();
 		frame.getContentPane().add(melodyPanel);
+		
 
 	}
 
@@ -515,11 +522,14 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 				oneLoopTime = 240000 / bpm;
 				if (loopFlag == false)
 				{
-
+					
 					currentPtn = ptnStream[count];
 					refreshPatternBox(currentPtn);
 					ptnComBox.setSelectedIndex(currentPtn);
 					count++;
+					txtCount.setText(count+"/"+numOfPtns);
+					
+
 				}
 				while (elapTime <= oneLoopTime && playing == true)
 				{
@@ -529,8 +539,10 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 					if (elapTime == (oneLoopTime / 16) * i)
 					{
 						if (loopFlag == false)
-							progressBar.setValue((100 * count + 100 * i / 16)
-									/ numOfPtns);
+						{
+							progressBar.setValue((100 * (count-1) + 100 * i / 16)/ numOfPtns);
+							
+						}
 						playBar.setValue(i - 1);
 						if (ptn[currentPtn].kickFlag[i - 1] == true)
 						{
@@ -611,7 +623,6 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 			boxSong.setSelected(true);
 			boxLoop.setSelected(false);
 			loopFlag = false;
-			getPatternStream();
 		}
 		if (e.getSource() == boxLoop)
 		{
@@ -674,7 +685,9 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		if (e.getSource() == btnApply)
 		{
 			playing = false;// 새로운 패턴순서를 적용하기 전에 재생을 멈춘다.
+			
 			getPatternStream();
+			
 		}
 
 		if (e.getSource() == btnLoad)
@@ -705,6 +718,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		}
 
 	}
+	
 
 	public void getPatternStream()
 	{
@@ -717,6 +731,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 			temp = ptnField.getText().charAt(i);
 			ptnStream[i] = (int) temp - 48;
 		}
+		txtCount.setText("0/"+numOfPtns);
 	}
 
 	public void refreshPatternBox(int currentPtn)
@@ -739,6 +754,10 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		return currentDrum;
 	}
 
+	public static void setPlayingTrue()
+	{
+		playing=true;
+	}
 	public static void setCurrentMelody(int index)
 	{
 		currentMelody = index;
@@ -821,7 +840,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 			fileStream = fileStream + "\n";
 		}
 
-		fileStream = ptnField.getText() + "\n" + fileStream;
+		fileStream = currentDrum+"\n"+ bpm+"\n"+ptnField.getText() + "\n" + fileStream;
 
 		BufferedWriter bw = null;
 		try
@@ -845,6 +864,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 				{
 				}
 		}
+		
 
 	}
 
@@ -861,12 +881,26 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 
 			RandomAccessFile file = new RandomAccessFile(new File(fileName),
 					"rw");
-
-			String str = null;
-			str = file.readLine();
 			char temp;
+			String str = null;
+			
+			str = file.readLine();
+			currentDrum=Integer.parseInt(str);
+					//(int)str.charAt(0)-48;
+			drumComBox.setSelectedIndex(currentDrum);
+			
+			str=file.readLine();
+			
+			bpm=Integer.parseInt(str);
+			spinnerBpm.setValue(bpm);
+			
+			str = file.readLine();
 			ptnField.setText(str);
 			getPatternStream();
+			
+			
+			
+			
 			int[][][] numPtns = new int[10][8][16];
 
 			int i = 0, j = 0;
@@ -1014,11 +1048,6 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 			ptnField.setText("");
 			fieldClickCnt++;
 		}
-		if (arg0.getSource() == imageLabel)// 아래부분을 클릭했을때 키보드로 연주가 가능하도록
-											// melodyPanel에 Focus를 맞춰준다.
-		{
-			melodyPanel.requestFocus();
-		}
 		if (arg0.getSource() == frame)
 		{
 			melodyPanel.requestFocus();// 아무것도 없는곳을 찍으면 커서가 해제되고 키보드연주가 가능하게 하기
@@ -1088,11 +1117,8 @@ class BeatPlayer extends Thread
 		Clip clip;
 		try
 		{
-			AudioInputStream audioInputStream = AudioSystem // wav파일 재생부-출처를
-															// 잊었는데
-															// stackoverflow.com에서
-															// 참조
-					.getAudioInputStream(file);
+			// wav파일 재생부-출처를 잊었는데 stackoverflow.com에서 참조
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
 			AudioFormat audioFormat = audioInputStream.getFormat();
 			DataLine.Info info = new DataLine.Info(SourceDataLine.class,
 					audioFormat);
@@ -1126,8 +1152,9 @@ class MelodyPlayer extends Thread
 	private String fileName = null;
 	BeatMaker temp;
 
-	public MelodyPlayer(int ch)
+	public MelodyPlayer(int ch,int ocv)
 	{
+		ch=ch+ocv;
 		fileName = "Wavs/Melody" + temp.currentMelody + "/" + ch + ".wav";
 	}
 
@@ -1147,7 +1174,7 @@ class MelodyPlayer extends Thread
 
 			int nBytesRead = 0;
 			byte[] abData = new byte[EXTERNAL_BUFFER_SIZE];
-			while (nBytesRead != -1)
+			while (nBytesRead != -1&&temp.playing==true)
 			{
 				nBytesRead = audioInputStream.read(abData, 0, abData.length);
 				if (nBytesRead >= 0)
@@ -1158,13 +1185,6 @@ class MelodyPlayer extends Thread
 			line.drain();
 			line.close();
 			audioInputStream.close();
-			/*
-			 * AudioInputStream AIS = AudioSystem.getAudioInputStream(new
-			 * File(fileName).getAbsoluteFile()); Clip clip =
-			 * AudioSystem.getClip(); clip.open(AIS); clip.start();
-			 * 
-			 * clip.close();
-			 */
 		} catch (Exception ex)
 		{
 			System.out.println("Error with playing sound.");
@@ -1172,26 +1192,89 @@ class MelodyPlayer extends Thread
 		}
 
 	}
+}
 
+class KeyPointer extends Thread
+{
+	private MelodyPanel temp;
+	public KeyPointer(int i)
+	{
+		temp.marks[i-1].setVisible(true);
+		try
+		{
+			sleep(300);
+		} catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		temp.marks[i-1].setVisible(false);
+	}
 }
 
 class MelodyPanel extends JPanel implements KeyListener, MouseListener
 {
-	BeatMaker temp;
+	private BeatMaker temp;
+	private JLabel imageLabel;
+	private ImageIcon keyGuide;
+	public static JLabel[] marks;
 
 	private int ocv = 12;// 옥타브설정변수 0일때 저음 12일때 중음 24일때 고음
 
 	public MelodyPanel()
 	{
-		setBounds(0, 349, 495, 156);
+		setBounds(0, 395, 495, 150);
 		addKeyListener(this);
 		addMouseListener(this);
+		//this.setToolTipText("라벨라벨");
 		Initialize();
 	}
 
 	public void Initialize()
 	{
-
+		this.setLayout(null);
+		
+		
+		marks=new JLabel[20];
+		for(int i=0;i<20;i++)
+		{
+		marks[i]=new JLabel("\u25A0");
+		marks[i].setForeground(Color.red);
+		this.add(marks[i]);
+		marks[i].setVisible(false);
+		}
+		marks[0].setBounds(20, 105, 20, 20);//Q
+		marks[1].setBounds(39, 55, 20, 20);//2
+		marks[2].setBounds(58, 105, 20, 20);//W
+		marks[3].setBounds(78, 55, 20, 20);//3
+		marks[4].setBounds(97, 105, 20, 20);//E
+		marks[5].setBounds(135, 105, 20, 20);//R
+		marks[6].setBounds(155, 55, 20, 20);//5
+		marks[7].setBounds(173, 105, 20, 20);//T
+		marks[8].setBounds(193, 55, 20, 20);//6
+		marks[9].setBounds(212, 105, 20, 20);//Y
+		marks[10].setBounds(232, 55, 20, 20);
+		marks[11].setBounds(250, 105, 20, 20);
+		marks[12].setBounds(289, 105, 20, 20);
+		marks[13].setBounds(309, 55, 20, 20);
+		marks[14].setBounds(327, 105, 20, 20);
+		marks[15].setBounds(347, 55, 20, 20);
+		marks[16].setBounds(365, 105, 20, 20);
+		marks[17].setBounds(404, 105, 20, 20);
+		marks[18].setBounds(424, 55, 20, 20);
+		marks[19].setBounds(442, 105, 20, 20);
+		
+		keyGuide = new ImageIcon("piano.jpg");
+		imageLabel = new JLabel(keyGuide);
+		imageLabel.setToolTipText("멜로디 기능을 이용하려면 클릭하세요");
+		imageLabel.setBounds(0, 0, 475, 150);
+		this.add(imageLabel);
+		imageLabel.addMouseListener(this);
+		
+		
+		
+		
+		
 	}
 
 	public void keyPressed(KeyEvent arg0)
@@ -1199,71 +1282,69 @@ class MelodyPanel extends JPanel implements KeyListener, MouseListener
 		// TODO Auto-generated method stub
 		int keycode = (int) arg0.getKeyCode();
 
+		temp.setPlayingTrue();
 		switch (keycode)
 		{
 			case KeyEvent.VK_Q:
-				MelodyPlayer p1 = new MelodyPlayer(1 + ocv);
-				p1.start();
+				(new MelodyPlayer(1,ocv)).start();
+				(new KeyPointer(1)).start();
 				break;
 			case KeyEvent.VK_2:
-				(new MelodyPlayer(2 + ocv)).start();
+				(new MelodyPlayer(2,ocv)).start();
 				break;
 			case KeyEvent.VK_W:
-				(new MelodyPlayer(3 + ocv)).start();
+				(new MelodyPlayer(3,ocv)).start();
 				break;
 			case KeyEvent.VK_3:
-				(new MelodyPlayer(4 + ocv)).start();
+				(new MelodyPlayer(4,ocv)).start();
 				break;
 			case KeyEvent.VK_E:
-				(new MelodyPlayer(5 + ocv)).start();
+				(new MelodyPlayer(5,ocv)).start();
 				break;
 			case KeyEvent.VK_R:
-				(new MelodyPlayer(6 + ocv)).start();
+				(new MelodyPlayer(6,ocv)).start();
 				break;
 			case KeyEvent.VK_5:
-				(new MelodyPlayer(7 + ocv)).start();
+				(new MelodyPlayer(7,ocv)).start();
 				break;
 			case KeyEvent.VK_T:
-				(new MelodyPlayer(8 + ocv)).start();
+				(new MelodyPlayer(8,ocv)).start();
 				break;
 			case KeyEvent.VK_6:
-				(new MelodyPlayer(9 + ocv)).start();
+				(new MelodyPlayer(9,ocv)).start();
 				break;
 			case KeyEvent.VK_Y:
-				(new MelodyPlayer(10 + ocv)).start();
+				(new MelodyPlayer(10,ocv)).start();
 				break;
 			case KeyEvent.VK_7:
-				(new MelodyPlayer(11 + ocv)).start();
+				(new MelodyPlayer(11,ocv)).start();
 				break;
 			case KeyEvent.VK_U:
-				(new MelodyPlayer(12 + ocv)).start();
+				(new MelodyPlayer(12,ocv)).start();
 				break;
 			case KeyEvent.VK_I:
-				(new MelodyPlayer(13 + ocv)).start();
+				(new MelodyPlayer(13,ocv)).start();
 				break;
 			case KeyEvent.VK_9:
-				(new MelodyPlayer(14 + ocv)).start();
+				(new MelodyPlayer(14,ocv)).start();
 				break;
 			case KeyEvent.VK_O:
-				(new MelodyPlayer(15 + ocv)).start();
+				(new MelodyPlayer(15,ocv)).start();
 				break;
 			case KeyEvent.VK_0:
-				(new MelodyPlayer(16 + ocv)).start();
+				(new MelodyPlayer(16,ocv)).start();
 				break;
 			case KeyEvent.VK_P:
-				(new MelodyPlayer(17 + ocv)).start();
+				(new MelodyPlayer(17,ocv)).start();
 				break;
 			case KeyEvent.VK_OPEN_BRACKET:// [key
-				(new MelodyPlayer(18 + ocv)).start();
+				(new MelodyPlayer(18,ocv)).start();
 				break;
 			case KeyEvent.VK_EQUALS:// =key
-				(new MelodyPlayer(19 + ocv)).start();
+				(new MelodyPlayer(19,ocv)).start();
 				break;
 			case KeyEvent.VK_CLOSE_BRACKET:// ]key
-				(new MelodyPlayer(20 + ocv)).start();
-				break;
-			case KeyEvent.VK_BACK_SLASH:// \key
-				(new MelodyPlayer(21 + ocv)).start();
+				(new MelodyPlayer(20,ocv)).start();
 				break;
 			case KeyEvent.VK_Z:
 				ocv = 0;
