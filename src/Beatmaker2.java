@@ -1,8 +1,10 @@
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
+import java.awt.*;
 
 import java.util.HashMap;
 
@@ -38,165 +40,143 @@ public class Beatmaker2
 	}
 }
 
-class BeatMaker extends JFrame implements ActionListener
+class KeyInput extends JPanel implements KeyListener
 {
-	public JFrame		frame;
-	private JButton		btnKick, btnSnare, btnHiHat, btnClap, btnAdd, btnDel,
+
+	@Override
+	public void keyPressed(KeyEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
+
+class BeatMaker extends JFrame implements ActionListener,KeyListener,MouseListener
+{
+	public JFrame frame;
+	private JButton btnKick, btnSnare, btnHiHat, btnClap, btnAdd, btnDel,
 			btnPlay, btnStop, btnBpmUp, btnBpmDn;
 
-	private JCheckBox[]	kickBox					= new JCheckBox[16];
-	private JCheckBox[]	snareBox				= new JCheckBox[16];
-	private JCheckBox[]	hatBox					= new JCheckBox[16];
-	private JCheckBox[]	clapBox					= new JCheckBox[16];
+	private JCheckBox[] kickBox = new JCheckBox[16];
+	private JCheckBox[] snareBox = new JCheckBox[16];
+	private JCheckBox[] hatBox = new JCheckBox[16];
+	private JCheckBox[] clapBox = new JCheckBox[16];
+	
+	private JPanel panel;
 
-	String[]			ptnList					=
-												{ "Pattern 1", "Pattern 2","Pattern 3", "Pattern 4", "Pattern 5","Pattern 6","Pattern 7","Pattern 8","Pattern 9","Pattern 10"};
-	private JComboBox	comboBox;
-	public int			cntPtn					= 0;
+	String[] ptnList =
+	{ "Pattern 1", "Pattern 2", "Pattern 3", "Pattern 4", "Pattern 5",
+			"Pattern 6", "Pattern 7", "Pattern 8", "Pattern 9", "Pattern 10" };
+	private JComboBox comboBox;
+	private int cntPtn = 0;
+	private int ocv=12;//옥타브바꿔주는거
 
-	private JLabel		lblBpm, lblBpmMeter;
+	private JLabel lblBpm, lblBpmMeter;
 
-	private JSpinner	spinnerBpm;
+	private JSpinner spinnerBpm;
 
-	private JSlider		playBar;
+	private JSlider playBar;
 
-	/*
-	 * public boolean[] kickFlag = new boolean[16]; public boolean[] snareFlag =
-	 * new boolean[16]; public boolean[] hatFlag = new boolean[16]; public
-	 * boolean[] clapFlag = new boolean[16];
-	 */
+	private Pattern[] ptn;
 
-	public Pattern[]	ptn;
+	private boolean playing = false;
 
-	public boolean		playing					= false;
+	private JLabel txt,txt2,txt3;
 
-	private JLabel		txt;
-
-	private int			bpm;
-	private static int	EXTERNAL_BUFFER_SIZE	= 128000;
+	private int bpm;
+	private static int EXTERNAL_BUFFER_SIZE = 128000;
 
 	public BeatMaker()
 	{
+		
+	
 		Initialize();
 
 	}
-    public void playSound(int instNum){
-    	String	fileName = null;
+
+	private File kickFile = new File("kick.wav").getAbsoluteFile();
+	private File snareFile = new File("snare.wav").getAbsoluteFile();
+	private File hatFile = new File("hat.wav").getAbsoluteFile();
+	private File clapFile = new File("clap.wav").getAbsoluteFile();
+
+	public void playSound(int instNum)
+	{
+		File file = null;
 
 		switch (instNum)
-			{
-				case 1:
-					fileName = "kick.wav";
-					break;
-				case 2:
-					fileName = "snare.wav";
-					break;
-				case 3:
-					fileName = "hat.wav";
-					break;
-				case 4:
-					fileName = "clap.wav";
-					break;
-			}
-    try{
-        AudioInputStream kickAIS = AudioSystem.getAudioInputStream(new File(fileName).getAbsoluteFile());
-        Clip kickclip = AudioSystem.getClip();
-        kickclip.open(kickAIS);
-        kickclip.start();
-    }catch(Exception ex){
-        System.out.println("Error with playing sound.");
-        ex.printStackTrace();
-    }
-}
-/*
-	class Player extends Thread
-	{
-		String	fileName;
-
-		public Player(int instNum)
 		{
-			switch (instNum)
-			{
-				case 1:
-					fileName = "kick.wav";
-					break;
-				case 2:
-					fileName = "snare.wav";
-					break;
-				case 3:
-					fileName = "hat.wav";
-					break;
-				case 4:
-					fileName = "clap.wav";
-					break;
-			}
+			case 1:
+				file = kickFile;
+				break;
+			case 2:
+				file = snareFile;
+				break;
+			case 3:
+				file = hatFile;
+				break;
+			case 4:
+				file = clapFile;
+				break;
 		}
-
-		public void run()
-		{// �޼ҵ�
-
-			Clip clip;
-			File soundFile = new File(fileName);
-			try
-			{
-				AudioInputStream audioInputStream = AudioSystem
-						.getAudioInputStream(soundFile);
-				AudioFormat audioFormat = audioInputStream.getFormat();
-				DataLine.Info info = new DataLine.Info(SourceDataLine.class,
-						audioFormat);
-				SourceDataLine line = (SourceDataLine) AudioSystem
-						.getLine(info);
-				line.open(audioFormat);
-				line.start();
-
-				int nBytesRead = 0;
-				byte[] abData = new byte[EXTERNAL_BUFFER_SIZE];
-				while (nBytesRead != -1)
-				{
-					nBytesRead = audioInputStream
-							.read(abData, 0, abData.length);
-					if (nBytesRead >= 0)
-					{
-						line.write(abData, 0, nBytesRead);
-					}
-				}
-				line.drain();
-				line.close();
-				audioInputStream.close();
-			} catch (Exception e)
-			{
-				e.printStackTrace();
-			}
+		try
+		{
+			AudioInputStream AIS = AudioSystem.getAudioInputStream(file);
+			Clip clip = AudioSystem.getClip();
+			clip.open(AIS);
+			clip.start();
+		} catch (Exception ex)
+		{
+			System.out.println("Error with playing sound.");
+			ex.printStackTrace();
 		}
-	}*/
+	}
 
 	class PlayThread extends Thread
 	{
+		private long startTime;
+		private long elapTime;
+		private long cntTime;
+		private long oneLoopTime;
+		private int i;
 		public void run()
 		{
-
 			playing = true;
-			int i = 1;
 			while (playing == true)
 			{
 				i = 1;
-				long startTime = System.currentTimeMillis();
-				long elapTime = 0;
-				long cntTime = startTime;
-				long olt = 240000 / bpm;
-				while (elapTime <= olt && playing == true)
+				startTime = System.currentTimeMillis();
+				elapTime = 0;
+				cntTime = startTime;
+				oneLoopTime = 240000 / bpm;
+				while (elapTime <= oneLoopTime && playing == true)
 				{
 					cntTime = System.currentTimeMillis();
 					elapTime = cntTime - startTime;
-					if (elapTime == (olt / 16) * i)
+					if (elapTime == (oneLoopTime / 16) * i)
 					{
 						playBar.setValue(i - 1);
 						txt.setText(i + "");
 						if (ptn[cntPtn].kickFlag[i - 1] == true)
 						{
 							playSound(1);
-							/*Player p = new Player(1);
-							p.start();*/
+							/*
+							 * Player p = new Player(1); p.start();
+							 */
 						}
 						if (ptn[cntPtn].snareFlag[i - 1] == true)
 						{
@@ -220,14 +200,16 @@ class BeatMaker extends JFrame implements ActionListener
 
 	public void Initialize()
 	{
+		
+		
 		ptn = new Pattern[10];
-		for(int i=0;i<10;i++)
+		for (int i = 0; i < 10; i++)
 		{
 			ptn[i] = new Pattern();
 		}
 
 		frame = new JFrame();
-		frame.setTitle("BeatMaker_DEMO_v001");
+		frame.setTitle("BeatMaker_DEMO_v003");
 		frame.setBounds(100, 100, 480, 323);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -368,7 +350,7 @@ class BeatMaker extends JFrame implements ActionListener
 			clapBox[i].addActionListener(this);
 		}
 
-		/*lblBpm = new JLabel("BPM");
+		lblBpm = new JLabel("BPM");
 		lblBpm.setBounds(363, 55, 27, 22);
 		frame.getContentPane().add(lblBpm);
 
@@ -377,40 +359,26 @@ class BeatMaker extends JFrame implements ActionListener
 		lblBpmMeter.setBounds(395, 55, 40, 22);
 		frame.getContentPane().add(lblBpmMeter);
 
-		btnBpmUp = new JButton("��");
+		btnBpmUp = new JButton("▲");
 		btnBpmUp.setBounds(425, 54, 20, 10);
 		frame.getContentPane().add(btnBpmUp);
 		btnBpmUp.addActionListener(this);
 
-		btnBpmDn = new JButton("��");
+		btnBpmDn = new JButton("▼");
 		btnBpmDn.setBounds(425, 67, 20, 10);
 		frame.getContentPane().add(btnBpmDn);
 		btnBpmDn.addActionListener(this);
-		
-		spinnerBpm = new JSpinner(); spinnerBpm.setBounds(405, 20, 42, 22);
-		spinnerBpm.setModel(new SpinnerNumberModel(120, 60, 180, 10));
-		frame.getContentPane().add(spinnerBpm);
-		spinnerBpm.addChangeListener(listener)
-		
+		/*
+		 * spinnerBpm = new JSpinner(); spinnerBpm.setBounds(405, 20, 42, 22);
+		 * spinnerBpm.setModel(new SpinnerNumberModel(120, 60, 180, 10));
+		 * frame.getContentPane().add(spinnerBpm);
+		 * spinnerBpm.addChangeListener(listener)
+		 */
 
 		btnAdd = new JButton("Add");
 		btnAdd.setBounds(100, 54, 70, 23);
 		frame.getContentPane().add(btnAdd);
 		btnAdd.addActionListener(this);
-
-
-
-		comboBox = new JComboBox(ptnList);
-		comboBox.setToolTipText("Pattern");
-		comboBox.setBounds(14, 54, 80, 21);
-		frame.getContentPane().add(comboBox);
-		comboBox.addActionListener(this);
-
-		txt = new JLabel();
-		txt.setForeground(Color.red);
-		txt.setBounds(273, 255, 100, 21);
-		frame.getContentPane().add(txt);
-		*/
 
 		btnPlay = new JButton("\u25B6");
 		btnPlay.setBounds(245, 54, 50, 23);
@@ -427,6 +395,36 @@ class BeatMaker extends JFrame implements ActionListener
 		playBar.setValue(9);
 		playBar.setMaximum(15);
 		frame.getContentPane().add(playBar);
+
+		comboBox = new JComboBox(ptnList);
+		comboBox.setToolTipText("Pattern");
+		comboBox.setBounds(14, 54, 80, 21);
+		frame.getContentPane().add(comboBox);
+		comboBox.addActionListener(this);
+
+		txt = new JLabel();
+		txt.setForeground(Color.red);
+		txt.setBounds(300, 235, 100, 21);
+		frame.getContentPane().add(txt);
+		
+		
+		
+		txt2 = new JLabel("키보드2~=,Q~]까지 피아노 옥타브변경은 Z:저음 X:중음 C:고음");
+		txt2.setForeground(Color.red);
+		txt2.setBounds(50, 255, 400, 30);
+		frame.getContentPane().add(txt2);
+		
+		txt3 = new JLabel("피아노 치려면 이쪽(아래쪽) 영역을 클릭");
+		txt3.setForeground(Color.red);
+		txt3.setBounds(50, 235, 400, 30);
+		frame.getContentPane().add(txt3);
+		
+		panel = new JPanel();
+		panel.setBounds(0, 229, 495, 56);
+		frame.getContentPane().add(panel);
+		panel.addKeyListener(this);
+		panel.addMouseListener(this);
+
 	}
 
 	public void changeevent(ChangeEvent cev)
@@ -516,12 +514,238 @@ class BeatMaker extends JFrame implements ActionListener
 		}
 
 	}
+
+
+	/*class Piano extends Thread
+	{
+		String fileName = null;
+
+		public Piano(int ch)
+		{
+			fileName = ch + ".wav";
+		}
+*/
+		public void Piano(int ch)
+		{
+			String fileName = ch + ".wav";
+			try
+			{
+				txt.setText("눌림");
+				AudioInputStream AIS = AudioSystem.getAudioInputStream(new File(fileName).getAbsoluteFile());
+				Clip clip = AudioSystem.getClip();
+				clip.open(AIS);
+				clip.start();
+
+				
+			} catch (Exception ex)
+			{
+				System.out.println("Error with playing sound.");
+				ex.printStackTrace();
+			}
+
+		}
+
+	//}
+
+	@Override
+	public void keyPressed(KeyEvent e2)
+	{
+		int keycode = (int) e2.getKeyCode();
+
+		switch (keycode)
+		{
+			case KeyEvent.VK_Q:
+				Piano(1+ocv);
+				break;
+			case KeyEvent.VK_2:
+				Piano(2+ocv);
+				break;
+			case KeyEvent.VK_W:
+				Piano(3+ocv);
+				break;
+			case KeyEvent.VK_3:
+				Piano(4+ocv);
+				break;
+			case KeyEvent.VK_E:
+				Piano(5+ocv);
+				break;
+			case KeyEvent.VK_R:
+				Piano(6+ocv);
+				break;
+			case KeyEvent.VK_5:
+				Piano(7+ocv);
+				break;
+			case KeyEvent.VK_T:
+				Piano(8+ocv);
+				break;
+			case KeyEvent.VK_6:
+				Piano(9+ocv);
+				break;
+			case KeyEvent.VK_Y:
+				Piano(10+ocv);
+				break;
+			case KeyEvent.VK_7:
+				Piano(11+ocv);
+				break;
+			case KeyEvent.VK_U:
+				Piano(12+ocv);
+				break;
+			case KeyEvent.VK_I:
+				Piano(13+ocv);
+				break;
+			case KeyEvent.VK_9:
+				Piano(14+ocv);
+				break;
+			case KeyEvent.VK_O:
+				Piano(15+ocv);
+				break;
+			case KeyEvent.VK_0:
+				Piano(16+ocv);
+				break;
+			case KeyEvent.VK_P:
+				Piano(17+ocv);
+				break;
+			case KeyEvent.VK_OPEN_BRACKET:
+				Piano(18+ocv);
+				break;
+			case KeyEvent.VK_EQUALS:
+				Piano(19+ocv);
+				break;
+			case KeyEvent.VK_CLOSE_BRACKET:
+				Piano(20+ocv);
+				break;
+			case KeyEvent.VK_BACK_SLASH:
+				Piano(21+ocv);
+				break;
+			/*case KeyEvent.VK_Q:
+				(new Piano(1+ocv)).start();
+				break;
+			case KeyEvent.VK_2:
+				(new Piano(2+ocv)).start();
+				break;
+			case KeyEvent.VK_W:
+				(new Piano(3+ocv)).start();
+				break;
+			case KeyEvent.VK_3:
+				(new Piano(4+ocv)).start();
+				break;
+			case KeyEvent.VK_E:
+				(new Piano(5+ocv)).start();
+				break;
+			case KeyEvent.VK_R:
+				(new Piano(6+ocv)).start();
+				break;
+			case KeyEvent.VK_5:
+				(new Piano(7+ocv)).start();
+				break;
+			case KeyEvent.VK_T:
+				(new Piano(8+ocv)).start();
+				break;
+			case KeyEvent.VK_6:
+				(new Piano(9+ocv)).start();
+				break;
+			case KeyEvent.VK_Y:
+				(new Piano(10+ocv)).start();
+				break;
+			case KeyEvent.VK_7:
+				(new Piano(11+ocv)).start();
+				break;
+			case KeyEvent.VK_U:
+				(new Piano(12+ocv)).start();
+				break;
+			case KeyEvent.VK_I:
+				(new Piano(13+ocv)).start();
+				break;
+			case KeyEvent.VK_9:
+				(new Piano(14+ocv)).start();
+				break;
+			case KeyEvent.VK_O:
+				(new Piano(15+ocv)).start();
+				break;
+			case KeyEvent.VK_0:
+				(new Piano(16+ocv)).start();
+				break;
+			case KeyEvent.VK_P:
+				(new Piano(17+ocv)).start();
+				break;
+			case KeyEvent.VK_OPEN_BRACKET:
+				(new Piano(18+ocv)).start();
+				break;
+			case KeyEvent.VK_EQUALS:
+				(new Piano(19+ocv)).start();
+				break;
+			case KeyEvent.VK_CLOSE_BRACKET:
+				(new Piano(20+ocv)).start();
+				break;
+			case KeyEvent.VK_BACK_SLASH:
+				(new Piano(21+ocv)).start();
+				break;*/
+			case KeyEvent.VK_Z:
+				ocv=0;
+				break;
+			case KeyEvent.VK_X:
+				ocv=12;
+				break;
+			case KeyEvent.VK_C:
+				ocv=24;
+				break;
+		}
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e)
+	{
+		panel.requestFocus();		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
 
 class Pattern
 {
-	public boolean[]	kickFlag	= new boolean[16];
-	public boolean[]	snareFlag	= new boolean[16];
-	public boolean[]	hatFlag		= new boolean[16];
-	public boolean[]	clapFlag	= new boolean[16];
+	public boolean[] kickFlag = new boolean[16];
+	public boolean[] snareFlag = new boolean[16];
+	public boolean[] hatFlag = new boolean[16];
+	public boolean[] clapFlag = new boolean[16];
 }
