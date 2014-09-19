@@ -38,7 +38,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 {
 	public JFrame frame;
 	// 메인창
-	
+
 	private JButton btnKick, btnSnare, btnHiHat, btnClap, btnInst5, btnInst6,
 			btnInst7, btnInst8, btnPlay, btnStop, btnSave, btnLoad, btnApply;
 	// 드럼버튼8개,재생,저장,불러오기,패턴적용 버튼
@@ -62,27 +62,25 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 	private String[] drumList =
 	{ "HipHop1", "HipHop2", "HipHop3", "Classic1", "Classic2", "Dance" };
 	private JComboBox ptnComBox, drumComBox;
-	//패턴선택콤보박스,드럼선택콤보박스 생성
-	
+	// 패턴선택콤보박스,드럼선택콤보박스 생성
+
 	private JSlider playBar;
-	//16박자 중에서 현재 몇번째 박자를 재생하고 있는지를 가리켜 주는 포인터
-	
+	// 16박자 중에서 현재 몇번째 박자를 재생하고 있는지를 가리켜 주는 포인터
+
 	private JProgressBar progressBar;
-	//song재생 모드에서 전체 패턴스트림 중에서 현재 어느정도 지나왔는지를 보여주기 위한 progressBar;
-	
+	// song재생 모드에서 전체 패턴스트림 중에서 현재 어느정도 지나왔는지를 보여주기 위한 progressBar;
+
 	private JLabel txtCount;
-	//song재생 모드에서 전체 패턴스트림 중에서 현재 재생하는 패턴이 몇번째 패턴인지를 표시
+	// song재생 모드에서 전체 패턴스트림 중에서 현재 재생하는 패턴이 몇번째 패턴인지를 표시
 
 	private JTextField ptnField;
-	//재생하고싶은 패턴순서스트림을 입력할 수 있는 Field
+	// 재생하고싶은 패턴순서스트림을 입력할 수 있는 Field
 
 	private JLabel lblBpm;
-	//"BPM:"
+	// "BPM:"
 
 	private JSpinner spinnerBpm;
-	//BPM을 조절할 수 있음
-	
-	
+	// BPM을 조절할 수 있음
 
 	private int bpm, numOfPtns;
 	private int fieldClickCnt = 0;
@@ -91,26 +89,25 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 	public static boolean playFlag;
 	private boolean loopFlag = false;
 	private int[] ptnStream = new int[500];
-	//bpm:현재bpm정보 저장
-	//numOfPtns:입력받은 패턴의 수를 저장
-	//fieldClickCnt:패턴입력받을 필드를 클릭한 횟수를 체크(처음 클릭할때 안내멘트가 사라지도록 하기위함)
-	//currentPtn:현재 재생하고있는 패턴이 몇번째 패턴인지를 가리킴
-	//currentDrum:현재 설정된 드럼이 어떤 드럼인지를 가리킴(비트재생클래스에서 필요하므로 public선언)
-	//playFlag:재생과 정지에 이용하기 위한 신호로 쓸 Boolean변수(꼭 true에서 재생, false에서 정지는 아님)
-	//loopFlag:song모드인지 loop모드인지를 구분해주는 신호로 쓸 Boolean변수
-	//ptnStream:song모드에서 재생할 패턴순서스트림을 저장할 배열
-	
-	private Pattern[] ptn = new Pattern[10];
-	//8개의 드럼의 패턴정보를 저장할 Patten 클래스를 10개 배열로 만들어 총 10개의 패턴정보가 모두 저장됨
-	
-	private JPanel melodyPanel;
-	//현재창 안에 멜로디 재생부를 담당할 Panel을 생성
-	
+	// bpm:현재bpm정보 저장
+	// numOfPtns:입력받은 패턴의 수를 저장
+	// fieldClickCnt:패턴입력받을 필드를 클릭한 횟수를 체크(처음 클릭할때 안내멘트가 사라지도록 하기위함)
+	// currentPtn:현재 재생하고있는 패턴이 몇번째 패턴인지를 가리킴
+	// currentDrum:현재 설정된 드럼이 어떤 드럼인지를 가리킴(비트재생클래스에서 필요하므로 public선언)
+	// playFlag:재생과 정지에 이용하기 위한 신호로 쓸 Boolean변수(꼭 true에서 재생, false에서 정지는 아님)
+	// loopFlag:song모드인지 loop모드인지를 구분해주는 신호로 쓸 Boolean변수
+	// ptnStream:song모드에서 재생할 패턴순서스트림을 저장할 배열
 
+	private Pattern[] ptn = new Pattern[10];
+	// 8개의 드럼의 패턴정보를 저장할 Patten 클래스를 10개 배열로 만들어 총 10개의 패턴정보가 모두 저장됨
+
+	private JPanel melodyPanel;
+
+	// 현재창 안에 멜로디 재생부를 담당할 Panel을 생성
 
 	public BeatMaker()
 	{
-		Initialize(); //현재클래스 생성시 초기화
+		Initialize(); // 현재클래스 생성시 초기화
 	}
 
 	public void Initialize()
@@ -119,17 +116,17 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		{
 			ptn[i] = new Pattern();
 		}
-		//8개의 드럼의 패턴정보를 저장할수 있는 Pattern인스턴스를 10개 생성
+		// 8개의 드럼의 패턴정보를 저장할수 있는 Pattern인스턴스를 10개 생성
 
 		frame = new JFrame();
-		frame.setTitle("BeatMaker_DEMO_v007");
-		frame.setBounds(100, 100, 480, 570);
+		frame.setTitle("BeatMaker_DEMO_v008");
+		frame.setBounds(100, 100, 480, 670);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addMouseListener(this);
 		frame.getContentPane().setLayout(null);
-		//메인창
-		
+		// 메인창
+
 		btnKick = new JButton("Kick");
 		btnKick.setToolTipText("hear Kick sound");
 		btnKick.setBounds(14, 123, 73, 23);
@@ -178,7 +175,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		frame.getContentPane().add(btnInst6);
 		frame.getContentPane().add(btnInst7);
 		frame.getContentPane().add(btnInst8);
-		//각각 드럼의 소리를 들어볼수 있는 버튼들을 실제로 생성
+		// 각각 드럼의 소리를 들어볼수 있는 버튼들을 실제로 생성
 
 		int i;
 		for (i = 0; i < 16; i++)
@@ -395,13 +392,16 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		inst8Box[13].setBounds(384, 335, 21, 21);
 		inst8Box[14].setBounds(405, 335, 21, 21);
 		inst8Box[15].setBounds(426, 335, 21, 21);
+		
+
 
 		for (i = 0; i < 16; i++)
 		{
 			frame.getContentPane().add(inst8Box[i]);
 			inst8Box[i].addActionListener(this);
 		}
-
+		//패턴 입력부 역할을 할 CheckBox를 생성
+		
 		lblBpm = new JLabel("BPM");
 		lblBpm.setBounds(370, 70, 27, 21);
 		frame.getContentPane().add(lblBpm);
@@ -412,6 +412,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		spinnerBpm.setModel(new SpinnerNumberModel(120, 60, 240, 10));
 		frame.getContentPane().add(spinnerBpm);
 		spinnerBpm.addChangeListener(this);
+		//BPM초기화, 입력박스 생성
 
 		btnLoad = new JButton("Load");
 		btnLoad.setBounds(300, 10, 70, 21);
@@ -434,24 +435,29 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		btnStop.setBounds(300, 70, 50, 21);
 		frame.getContentPane().add(btnStop);
 		btnStop.addActionListener(this);
+		//Load, Save, Play, Stop 버튼 생성
+		
 
 		playBar = new JSlider();
 		playBar.setBounds(93, 100, 354, 21);
 		playBar.setValue(0);
 		playBar.setMaximum(15);
 		frame.getContentPane().add(playBar);
+		//현재 몇번째 checkbox를 처리중인지를 보여줄 slider
 
 		ptnComBox = new JComboBox(ptnList);
 		ptnComBox.setToolTipText("패턴 선택");
 		ptnComBox.setBounds(14, 70, 80, 21);
 		frame.getContentPane().add(ptnComBox);
 		ptnComBox.addActionListener(this);
+		//패턴을 최대 10가지로 입력받을수 있게끔 해주는 패턴선택 박스
 
 		drumComBox = new JComboBox(drumList);
 		drumComBox.setToolTipText("드럼 선택");
 		drumComBox.setBounds(100, 70, 80, 21);
 		frame.getContentPane().add(drumComBox);
 		drumComBox.addActionListener(this);
+		//드럼 종류를 선택할 수 있는 박스
 
 		ptnField = new JTextField();
 		ptnField.setText("패턴을 입력하세요 ex)1123");
@@ -460,11 +466,13 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		ptnField.setColumns(500);
 		ptnField.addActionListener(this);
 		ptnField.addMouseListener(this);
+		//패턴이 재생될 순서를 지정해줄 텍스트필드
 
 		btnApply = new JButton("Apply");
 		btnApply.setBounds(260, 40, 70, 21);
 		frame.getContentPane().add(btnApply);
 		btnApply.addActionListener(this);
+		//입력한 패턴순서가 메모리에 저장되어 그대로 재생될수 있도록 적용시키는 버튼
 
 		boxSong = new JCheckBox("song");
 		boxSong.setToolTipText("패턴순서대로 재생");
@@ -479,6 +487,8 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		boxLoop.addActionListener(this);
 		boxLoop.setSelected(true);
 		loopFlag = true;
+		//
+		
 
 		progressBar = new JProgressBar();
 		progressBar.setBounds(93, 366, 355, 15);
@@ -491,6 +501,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		melodyPanel = new MelodyPanel();
 		frame.getContentPane().add(melodyPanel);
 
+		melodyPanel.requestFocus();
 	}
 
 	class PlayThread extends Thread
@@ -584,7 +595,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 	public void actionPerformed(ActionEvent e)
 	{
 
-		Object ee;
+		
 		int i;
 		if (e.getSource() == btnPlay)
 		{
@@ -706,6 +717,7 @@ class BeatMaker extends JFrame implements ActionListener, ChangeListener,
 		{
 			currentDrum = drumComBox.getSelectedIndex();
 		}
+		melodyPanel.requestFocus();
 
 	}
 
@@ -1146,7 +1158,7 @@ class MelodyPlayer extends Thread
 
 	public void run()
 	{
-		(new KeyPointer(choice)).start();
+		(new KeyPointer(choice, true)).start();
 		// String fileName = ch + ".wav";
 		try
 		{
@@ -1181,36 +1193,184 @@ class MelodyPlayer extends Thread
 	}
 }
 
-class KeyPointer extends Thread
+class WavPlayer extends Thread
 {
-	private int n;
-	private MelodyPanel temp;
+	private static final int EXTERNAL_BUFFER_SIZE = 128000;
+	private String fileName = null;
+	private BeatMaker temp;
+	private MelodyPanel temp2;
+	private int choice;
 
-	public KeyPointer(int i)
+	public WavPlayer(String adress, int i)
 	{
-		n = i - 1;
+		fileName = adress;
+		choice= i;
 	}
 
 	public void run()
 	{
+		switch (choice)
+		{
+			case 0:
+				temp2.v.setForeground(Color.RED);
+				break;
+			case 1:
+				temp2.b.setForeground(Color.RED);
+				break;
+			case 2:
+				temp2.n.setForeground(Color.RED);
+				break;
+			case 3:
+				temp2.m.setForeground(Color.RED);
+				break;
+		}
+		
 		try
 		{
-			temp.marks[n].setVisible(true);
-			sleep(150);
-			temp.marks[n].setVisible(false);
-		} catch (InterruptedException e)
+			AudioInputStream audioInputStream = AudioSystem
+					.getAudioInputStream(new File(fileName));
+			AudioFormat audioFormat = audioInputStream.getFormat();
+			DataLine.Info info = new DataLine.Info(SourceDataLine.class,
+					audioFormat);
+			SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
+			line.open(audioFormat);
+			line.start();
+
+			int nBytesRead = 0;
+			byte[] abData = new byte[EXTERNAL_BUFFER_SIZE];
+			while (nBytesRead != -1 && temp.playFlag == true)
+			{
+				nBytesRead = audioInputStream.read(abData, 0, abData.length);
+				if (nBytesRead >= 0)
+				{
+					line.write(abData, 0, nBytesRead);
+				}
+			}
+			switch (choice)
+			{
+				case 0:
+					temp2.v.setForeground(Color.BLACK);
+					break;
+				case 1:
+					temp2.b.setForeground(Color.BLACK);
+					break;
+				case 2:
+					temp2.n.setForeground(Color.BLACK);
+					break;
+				case 3:
+					temp2.m.setForeground(Color.BLACK);
+					break;
+			}
+			line.drain();
+			line.close();
+			audioInputStream.close();
+		} catch (Exception ex)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error with playing sound.");
+			ex.printStackTrace();
+			switch (choice)
+			{
+				case 0:
+					temp2.v.setForeground(Color.BLACK);
+					break;
+				case 1:
+					temp2.b.setForeground(Color.BLACK);
+					break;
+				case 2:
+					temp2.n.setForeground(Color.BLACK);
+					break;
+				case 3:
+					temp2.m.setForeground(Color.BLACK);
+					break;
+			}
+			
 		}
+
 	}
 }
+
+class KeyPointer extends Thread
+{
+	private int n;
+	private MelodyPanel temp;
+	private boolean flag;
+
+	public KeyPointer(int i, boolean f)
+	{
+		n = i - 1;
+		flag = f;
+	}
+
+	public void run()
+	{
+		if (flag)
+		{
+			try
+			{
+				temp.marks[n].setVisible(true);
+				sleep(150);
+				temp.marks[n].setVisible(false);
+			} catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			try
+			{
+				switch (n)
+				{
+					case 0:
+						temp.v.setForeground(Color.RED);
+						break;
+					case 1:
+						temp.b.setForeground(Color.RED);
+						break;
+					case 2:
+						temp.n.setForeground(Color.RED);
+						break;
+					case 3:
+						temp.m.setForeground(Color.RED);
+						break;
+				}
+				sleep(150);
+				switch (n)
+				{
+					case 0:
+						temp.v.setForeground(Color.BLACK);
+						break;
+					case 1:
+						temp.b.setForeground(Color.BLACK);
+						break;
+					case 2:
+						temp.n.setForeground(Color.BLACK);
+						break;
+					case 3:
+						temp.m.setForeground(Color.BLACK);
+						break;
+				}
+			} catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+}
+
+
 
 class MelodyPanel extends JPanel implements KeyListener, MouseListener,
 		ActionListener
 {
 	private BeatMaker temp;
 	private JLabel keyGuide;
+	private JTextField[] wavLoad = new JTextField[4];
+	private JButton[] wavLoadBtn = new JButton[4];
+	public static JLabel v, b, n, m;
 	public static JLabel[] marks;
 
 	public static int currentMelody = 0;
@@ -1224,7 +1384,7 @@ class MelodyPanel extends JPanel implements KeyListener, MouseListener,
 
 	public MelodyPanel()
 	{
-		setBounds(0, 363, 495, 182);
+		setBounds(0, 363, 495, 282);
 		addKeyListener(this);
 		addMouseListener(this);
 		// this.setToolTipText("라벨라벨");
@@ -1243,31 +1403,30 @@ class MelodyPanel extends JPanel implements KeyListener, MouseListener,
 			this.add(marks[i]);
 			marks[i].setVisible(false);
 		}
-		marks[0].setBounds(20, 137, 20, 20);// Q
-		marks[1].setBounds(39, 87, 20, 20);// 2
-		marks[2].setBounds(58, 137, 20, 20);// W
-		marks[3].setBounds(78, 87, 20, 20);// 3
-		marks[4].setBounds(97, 137, 20, 20);// E
-		marks[5].setBounds(135, 137, 20, 20);// R
-		marks[6].setBounds(155, 87, 20, 20);// 5
-		marks[7].setBounds(173, 137, 20, 20);// T
-		marks[8].setBounds(193, 87, 20, 20);// 6
-		marks[9].setBounds(212, 137, 20, 20);// Y
-		marks[10].setBounds(232, 87, 20, 20);
-		marks[11].setBounds(250, 137, 20, 20);
-		marks[12].setBounds(289, 137, 20, 20);
-		marks[13].setBounds(309, 87, 20, 20);
-		marks[14].setBounds(327, 137, 20, 20);
-		marks[15].setBounds(347, 87, 20, 20);
-		marks[16].setBounds(365, 137, 20, 20);
-		marks[17].setBounds(404, 137, 20, 20);
-		marks[18].setBounds(424, 87, 20, 20);
-		marks[19].setBounds(442, 137, 20, 20);
+		marks[0].setBounds(20, 237, 20, 20);// Q
+		marks[1].setBounds(39, 187, 20, 20);// 2
+		marks[2].setBounds(58, 237, 20, 20);// W
+		marks[3].setBounds(78, 187, 20, 20);// 3
+		marks[4].setBounds(97, 237, 20, 20);// E
+		marks[5].setBounds(135, 237, 20, 20);// R
+		marks[6].setBounds(155, 187, 20, 20);// 5
+		marks[7].setBounds(173, 237, 20, 20);// T
+		marks[8].setBounds(193, 187, 20, 20);// 6
+		marks[9].setBounds(212, 237, 20, 20);// Y
+		marks[10].setBounds(232, 187, 20, 20);
+		marks[11].setBounds(250, 237, 20, 20);
+		marks[12].setBounds(289, 237, 20, 20);
+		marks[13].setBounds(309, 187, 20, 20);
+		marks[14].setBounds(327, 237, 20, 20);
+		marks[15].setBounds(347, 187, 20, 20);
+		marks[16].setBounds(365, 237, 20, 20);
+		marks[17].setBounds(404, 237, 20, 20);
+		marks[18].setBounds(424, 187, 20, 20);
+		marks[19].setBounds(442, 237, 20, 20);
 
-		
 		keyGuide = new JLabel(new ImageIcon("piano.jpg"));
 		keyGuide.setToolTipText("멜로디 기능을 이용하려면 클릭하세요");
-		keyGuide.setBounds(0, 32, 475, 150);
+		keyGuide.setBounds(0, 132, 475, 150);
 		this.add(keyGuide);
 		keyGuide.addMouseListener(this);
 
@@ -1276,6 +1435,59 @@ class MelodyPanel extends JPanel implements KeyListener, MouseListener,
 		melodyComBox.setBounds(14, 0, 73, 21);
 		this.add(melodyComBox);
 		melodyComBox.addActionListener(this);
+
+		v = new JLabel("V");
+		v.setBounds(17, 40, 21, 21);
+		this.add(v);
+		b = new JLabel("B");
+		b.setBounds(17, 65, 21, 21);
+		this.add(b);
+		n = new JLabel("N");
+		n.setBounds(17, 90, 21, 21);
+		this.add(n);
+		m = new JLabel("M");
+		m.setBounds(17, 115, 21, 21);
+		this.add(m);
+
+		wavLoad[0] = new JTextField("wav파일을 Load후 좌측의 키보드를 누르세요");
+		wavLoad[0].setBounds(35, 40, 350, 21);
+		wavLoad[0].setEditable(false);
+		this.add(wavLoad[0]);
+
+		wavLoad[1] = new JTextField("wav파일을 Load후 좌측의 키보드를 누르세요");
+		wavLoad[1].setBounds(35, 65, 350, 21);
+		wavLoad[1].setEditable(false);
+		this.add(wavLoad[1]);
+
+		wavLoad[2] = new JTextField("wav파일을 Load후 좌측의 키보드를 누르세요");
+		wavLoad[2].setBounds(35, 90, 350, 21);
+		wavLoad[2].setEditable(false);
+		this.add(wavLoad[2]);
+
+		wavLoad[3] = new JTextField("wav파일을 Load후 좌측의 키보드를 누르세요");
+		wavLoad[3].setBounds(35, 115, 350, 21);
+		wavLoad[3].setEditable(false);
+		this.add(wavLoad[3]);
+
+		wavLoadBtn[0] = new JButton("Load");
+		wavLoadBtn[0].setBounds(385, 40, 70, 20);
+		this.add(wavLoadBtn[0]);
+		wavLoadBtn[0].addActionListener(this);
+
+		wavLoadBtn[1] = new JButton("Load");
+		wavLoadBtn[1].setBounds(385, 65, 70, 20);
+		this.add(wavLoadBtn[1]);
+		wavLoadBtn[1].addActionListener(this);
+
+		wavLoadBtn[2] = new JButton("Load");
+		wavLoadBtn[2].setBounds(385, 90, 70, 20);
+		this.add(wavLoadBtn[2]);
+		wavLoadBtn[2].addActionListener(this);
+
+		wavLoadBtn[3] = new JButton("Load");
+		wavLoadBtn[3].setBounds(385, 115, 70, 20);
+		this.add(wavLoadBtn[3]);
+		wavLoadBtn[3].addActionListener(this);
 
 	}
 
@@ -1374,6 +1586,21 @@ class MelodyPanel extends JPanel implements KeyListener, MouseListener,
 			case KeyEvent.VK_H:
 				setCurrentMelody(5);
 				break;
+			case KeyEvent.VK_V:
+				(new WavPlayer(wavLoad[0].getText(),0)).start();
+				break;
+			case KeyEvent.VK_B:
+				(new WavPlayer(wavLoad[1].getText(),1)).start();
+				
+				break;
+			case KeyEvent.VK_N:
+				(new WavPlayer(wavLoad[2].getText(),2)).start();
+				
+				break;
+			case KeyEvent.VK_M:
+				(new WavPlayer(wavLoad[3].getText(),3)).start();
+				//(new KeyPointer(4, false)).start();
+				break;
 
 		}
 
@@ -1443,6 +1670,22 @@ class MelodyPanel extends JPanel implements KeyListener, MouseListener,
 		{
 			currentMelody = melodyComBox.getSelectedIndex();
 			this.requestFocus();
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			if (arg0.getSource() == wavLoadBtn[i])
+			{
+
+				FileDialog loadWav = new FileDialog(temp, "Load",
+						FileDialog.LOAD);
+				// FileDialog loadWav = new FileDialog(this, "Load",
+				// FileDialog.LOAD);
+				loadWav.setFile("*.wav");
+				loadWav.setVisible(true);
+				if (loadWav.getFile() != null)
+					wavLoad[i].setText(loadWav.getDirectory()
+							+ loadWav.getFile());
+			}
 		}
 	}
 
